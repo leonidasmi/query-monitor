@@ -19,6 +19,8 @@ export type MainContextType = {
 	setEditor: ( editor: string ) => void;
 	theme: string;
 	setTheme: ( theme: string ) => void;
+	queryDiffEnabled: boolean;
+	setQueryDiffEnabled: ( enabled: boolean ) => void;
 	filters: FiltersType;
 	setFilters: ( filters: FiltersType ) => void;
 	switchToPanel: ( panelId: string, panelFilters?: PanelContextType['filters'] ) => void;
@@ -30,6 +32,8 @@ export const MainContext = createContext<MainContextType>( {
 	setEditor: ( _editor ) => {},
 	theme: 'auto',
 	setTheme: ( _theme ) => {},
+	queryDiffEnabled: false,
+	setQueryDiffEnabled: ( _enabled ) => {},
 	filters: {},
 	setFilters: ( _filters ) => {},
 	switchToPanel: ( _panelId, _panelFilters ) => {},

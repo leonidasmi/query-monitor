@@ -34,9 +34,11 @@ import { Settings } from '../output/html/settings';
 import { ConcernedHooks } from '../output/html/concerned_hooks';
 import { Scripts } from '../output/html/assets_scripts';
 import { Styles } from '../output/html/assets_styles';
+import { DBQueriesDiff } from '../output/html/db_queries_diff';
 import { Theme } from '../output/html/theme';
 import { Timing } from '../output/html/timing';
 import { Transients } from '../output/html/transients';
+import { extractQuerySQL, initializeQueryDiff, setQueryDiffEnabled } from '../output/query-diff';
 
 // what is this?
 type iQM = {
@@ -119,6 +121,10 @@ registerPanel( 'db_expensive', {
 } );
 registerPanel( 'db_queries', {
 	render: ( data, enabled ) => <DBQueries data={ data } enabled={ enabled } />,
+	data: 'db_queries',
+} );
+registerPanel( 'db_queries_diff', {
+	render: ( data, enabled ) => <DBQueriesDiff data={ data } enabled={ enabled } />,
 	data: 'db_queries',
 } );
 registerPanel( 'doing_it_wrong', {
@@ -233,6 +239,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	const filtersKey = 'qm-filters';
 	const containerHeightKey = 'qm-container-height';
 	const containerWidthKey = 'qm-container-width';
+	const queryDiffEnabledKey = 'qm-query-diff-enabled';
 
 	const onPanelChange = ( active: string ) => {
 		localStorage.setItem( panelKey, active );
@@ -250,6 +257,12 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		localStorage.setItem( editorKey, editor );
 	}
 
+	const onQueryDiffEnabledChange = ( enabled: boolean ) => {
+		localStorage.setItem( queryDiffEnabledKey, enabled ? 'true' : 'false' );
+		const queryRows = QueryMonitorData.data.db_queries?.data.rows;
+		setQueryDiffEnabled( enabled, extractQuerySQL( queryRows ) );
+	}
+
 	const onFiltersChange = ( filters: MainContextType['filters'] ) => {
 		sessionStorage.setItem( filtersKey, JSON.stringify( filters ) );
 	}
@@ -263,6 +276,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 	const side = localStorage.getItem( positionKey ) === 'right';
 	const editor = localStorage.getItem( editorKey ) ?? '';
 	const theme = localStorage.getItem( themeKey ) ?? 'auto';
+	const queryDiffEnabled = localStorage.getItem( queryDiffEnabledKey ) === 'true';
 	const rawFilters = sessionStorage.getItem( filtersKey );
 	const filters = rawFilters ? JSON.parse( rawFilters ) : {};
 	const rawContainerHeight = localStorage.getItem( containerHeightKey );
@@ -274,6 +288,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
 		auth_nonce: QueryMonitorData.l10n.auth_nonce,
 		file_path_map: QueryMonitorData.l10n.file_path_map,
 	};
+
+	initializeQueryDiff( queryDiffEnabled, extractQuerySQL( QueryMonitorData.data.db_queries?.data.rows ) );
 
 	if ( ! containerElement ) {
 		return;
@@ -290,6 +306,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			side={ side }
 			theme={ theme }
 			editor={ editor }
+			queryDiffEnabled={ queryDiffEnabled }
 			filters={ filters }
 			containerHeight={ containerHeight }
 			onPanelChange={ onPanelChange }
@@ -297,6 +314,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 			onSideChange={ onSideChange }
 			onThemeChange={ onThemeChange }
 			onEditorChange={ onEditorChange }
+			onQueryDiffEnabledChange={ onQueryDiffEnabledChange }
 			onFiltersChange={ onFiltersChange }
 		/>
 	);

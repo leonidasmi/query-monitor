@@ -34,6 +34,7 @@ type Props = {
 	side: boolean;
 	theme: string;
 	editor: string;
+	queryDiffEnabled: boolean;
 	filters: MainContextType['filters'];
 	containerHeight: number | null;
 	onPanelChange: ( active: string ) => void;
@@ -41,6 +42,7 @@ type Props = {
 	onSideChange: ( side: boolean ) => void;
 	onThemeChange: ( theme: string ) => void;
 	onEditorChange: ( editor: string ) => void;
+	onQueryDiffEnabledChange: ( enabled: boolean ) => void;
 	onFiltersChange: ( filters: MainContextType['filters'] ) => void;
 }
 
@@ -49,6 +51,7 @@ export const QM = ( props: Props ) => {
 	const [ side, setSide ] = React.useState( props.side );
 	const [ theme, setTheme ] = React.useState( props.theme );
 	const [ editor, setEditor ] = React.useState( props.editor );
+	const [ queryDiffEnabled, setQueryDiffEnabled ] = React.useState( props.queryDiffEnabled );
 	const [ filters, setFilters ] = React.useState( props.filters );
 
 	const setActivePanel = ( active: string ) => {
@@ -81,6 +84,11 @@ export const QM = ( props: Props ) => {
 		setEditor: ( editor: string ) => {
 			props.onEditorChange( editor );
 			setEditor( editor );
+		},
+		queryDiffEnabled: queryDiffEnabled,
+		setQueryDiffEnabled: ( enabled: boolean ) => {
+			props.onQueryDiffEnabledChange( enabled );
+			setQueryDiffEnabled( enabled );
 		},
 		filters: filters,
 		setFilters: ( filters: MainContextType['filters'] ) => {
